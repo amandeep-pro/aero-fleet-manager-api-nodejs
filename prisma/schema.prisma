@@ -12,3 +12,14 @@ model User {
   name  String
   email String @unique
 }
+
+model Aircraft {
+  id           String   @id @default(uuid()) @db.Uuid
+  model        String
+  registration String   @unique
+  manufacturer String
+  capacity     Int
+  status       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
