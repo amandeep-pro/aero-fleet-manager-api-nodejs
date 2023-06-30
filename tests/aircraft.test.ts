@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
-import routes from '../src/routes'; // Adjust the path if necessary
+import routes from '../src/routes'; 
 
 const app = express();
 const prisma = new PrismaClient();
