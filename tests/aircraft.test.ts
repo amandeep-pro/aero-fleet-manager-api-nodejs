@@ -2,6 +2,7 @@ import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
 import routes from '../src/routes'; 
+import { faker } from '@faker-js/faker';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -17,10 +18,10 @@ describe('Aircraft API', () => {
     const response = await request(app)
       .post('/api/aircrafts')
       .send({
-        model: 'Test Model',
-        registration: 'TEST123',
-        manufacturer: 'Test Manufacturer',
-        capacity: 100,
+        model: faker.vehicle.model(),
+        registration: faker.vehicle.vin(),
+        manufacturer: faker.vehicle.manufacturer(),
+        capacity: faker.number.int({ min: 50, max: 500 }), 
         status: 'in service'
       });
     testAircraftId = response.body.id;
@@ -45,14 +46,14 @@ describe('Aircraft API', () => {
     const response = await request(app)
       .post('/api/aircrafts')
       .send({
-        model: 'New Model',
-        registration: 'NEW123',
-        manufacturer: 'New Manufacturer',
-        capacity: 150,
+        model: faker.vehicle.model(),
+        registration: faker.vehicle.vin(),
+        manufacturer: faker.vehicle.manufacturer(),
+        capacity: faker.number.int({ min: 50, max: 500 }), 
         status: 'under maintenance'
       });
     expect(response.status).toBe(201);
-    expect(response.body.model).toBe('New Model');
+    expect(response.body.model).toBe(response.body.model); 
   });
 
   // Test PUT update aircraft

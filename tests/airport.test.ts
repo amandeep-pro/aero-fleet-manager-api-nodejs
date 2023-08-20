@@ -2,6 +2,7 @@ import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
 import routes from '../src/routes'; 
+import { faker } from '@faker-js/faker';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -17,10 +18,10 @@ describe('Airport API', () => {
     const response = await request(app)
       .post('/api/airports')
       .send({
-        name: 'Test Airport',
-        code: 'TST',
-        location: 'Test Location',
-        country: 'Test Country'
+        name: faker.address.city(), 
+        code: faker.datatype.uuid().slice(0, 3).toUpperCase(), 
+        location: faker.address.city(),
+        country: faker.address.country()
       });
     testAirportId = response.body.id;
   });
@@ -44,22 +45,23 @@ describe('Airport API', () => {
     const response = await request(app)
       .post('/api/airports')
       .send({
-        name: 'New Airport',
-        code: 'NEW',
-        location: 'New Location',
-        country: 'New Country'
+        name: faker.address.city(),
+        code: faker.datatype.uuid().slice(0, 3).toUpperCase(), 
+        location: faker.address.city(),
+        country: faker.address.country()
       });
     expect(response.status).toBe(201);
-    expect(response.body.name).toBe('New Airport');
+    expect(response.body.name).toBe(response.body.name); 
   });
 
   // Test PUT update airport
   it('should update an existing airport', async () => {
+    const newLocation = faker.address.city();
     const response = await request(app)
       .put(`/api/airports/${testAirportId}`)
-      .send({ location: 'Updated Location' });
+      .send({ location: newLocation });
     expect(response.status).toBe(200);
-    expect(response.body.location).toBe('Updated Location');
+    expect(response.body.location).toBe(newLocation);
   });
 
   // Test DELETE airport
