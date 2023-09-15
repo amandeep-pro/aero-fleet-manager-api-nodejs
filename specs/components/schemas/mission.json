@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "launchDate": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "status": {
+        "type": "string"
+      },
+      "aircraftId": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "required": ["name", "description", "launchDate", "status", "aircraftId"]
+  }
+  

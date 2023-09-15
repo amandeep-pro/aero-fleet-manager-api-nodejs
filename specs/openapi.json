@@ -1,0 +1,40 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Aerospace Fleet API",
+      "description": "API for managing aircraft, missions, and airports.",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Local server"
+      }
+    ],
+    "paths": {
+      "/api/aircrafts": {
+        "$ref": "./paths/aircraft.json"
+        
+      },
+      "/api/missions": {
+        "$ref": "./paths/mission.json"
+      },
+      "/api/airports": {
+        "$ref": "./paths/airport.json"
+      }
+    },
+    "components": {
+      "schemas": {
+        "Aircraft": {
+          "$ref": "./components/schemas/aircraft.json"
+        },
+        "Mission": {
+          "$ref": "./components/schemas/mission.json"
+        },
+        "Airport": {
+          "$ref": "./components/schemas/airport.json"
+        }
+      }
+    }
+  }
+  

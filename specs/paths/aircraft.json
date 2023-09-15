@@ -1,0 +1,102 @@
+{
+  "get": {
+    "summary": "Retrieve all aircraft",
+    "tags": ["Aircraft"],
+    "responses": {
+      "200": {
+        "description": "List of aircraft",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "../components/schemas/aircraft.json"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "summary": "Create a new aircraft",
+    "tags": ["Aircraft"],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../components/schemas/aircraft.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Aircraft created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/aircraft.json"
+            }
+          }
+        }
+      }
+    }
+  },
+  "put": {
+    "summary": "Update an existing aircraft",
+    "tags": ["Aircraft"],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../components/schemas/aircraft.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Aircraft updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/aircraft.json"
+            }
+          }
+        }
+      }
+    }
+  },
+  "delete": {
+    "summary": "Delete an aircraft",
+    "tags": ["Aircraft"],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "204": {
+        "description": "Aircraft deleted"
+      }
+    }
+  }
+}

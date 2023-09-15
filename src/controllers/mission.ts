@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../prisma/client';
 
-const prisma = new PrismaClient();
 
 // Create a new mission
 export const createMission = async (req: Request, res: Response) => {

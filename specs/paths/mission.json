@@ -1,0 +1,102 @@
+{
+  "get": {
+    "summary": "Retrieve all missions",
+    "tags": ["Mission"],
+    "responses": {
+      "200": {
+        "description": "List of missions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "../components/schemas/mission.json"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "post": {
+    "summary": "Create a new mission",
+    "tags": ["Mission"],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../components/schemas/mission.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Mission created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/mission.json"
+            }
+          }
+        }
+      }
+    }
+  },
+  "put": {
+    "summary": "Update an existing mission",
+    "tags": ["Mission"],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../components/schemas/mission.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Mission updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../components/schemas/mission.json"
+            }
+          }
+        }
+      }
+    }
+  },
+  "delete": {
+    "summary": "Delete a mission",
+    "tags": ["Mission"],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "204": {
+        "description": "Mission deleted"
+      }
+    }
+  }
+}
