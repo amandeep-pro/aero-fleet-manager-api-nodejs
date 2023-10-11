@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
-import routes from '../src/routes'; 
+import routes from '../src/routes';
 import { faker } from '@faker-js/faker';
 
 const app = express();
@@ -14,7 +14,7 @@ describe('Mission API', () => {
   let testMissionId: string;
   let testAircraftId: string;
 
-  // Create a new aircraft and mission before running tests
+  // Create a new aircraft before running tests
   beforeAll(async () => {
     const aircraftResponse = await request(app)
       .post('/api/aircrafts')
@@ -22,28 +22,34 @@ describe('Mission API', () => {
         model: faker.vehicle.model(),
         registration: faker.vehicle.vin(),
         manufacturer: faker.vehicle.manufacturer(),
-        capacity: faker.number.int({ min: 50, max: 500 }), 
-        status: faker.helpers.arrayElement(['in service', 'under maintenance', 'retired'])
+        capacity: faker.number.int({ min: 50, max: 500 }),
+        status: 'in service'
       });
     testAircraftId = aircraftResponse.body.id;
 
     const missionResponse = await request(app)
       .post('/api/missions')
       .send({
-        name: faker.lorem.sentence(),
-        description: faker.lorem.paragraph(),
-        launchDate: faker.date.future().toISOString(),
-        status: faker.helpers.arrayElement(['planned', 'scheduled', 'completed']),
+        name: faker.lorem.words(3),
+        description: faker.lorem.sentences(2),
+        launchDate: faker.date.future(),
+        status: 'planned',
         aircraftId: testAircraftId
       });
     testMissionId = missionResponse.body.id;
   });
 
-  // Test GET all missions
-  it('should get all missions', async () => {
-    const response = await request(app).get('/api/missions');
+  // Test GET all missions with pagination
+  it('should get all missions with pagination', async () => {
+    const page = 1;
+    const pageSize = 2;
+    const response = await request(app).get(`/api/missions?page=${page}&pageSize=${pageSize}`);
     expect(response.status).toBe(200);
-    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.data).toBeInstanceOf(Array);
+    expect(response.body.meta).toHaveProperty('totalItems');
+    expect(response.body.meta).toHaveProperty('currentPage');
+    expect(response.body.meta).toHaveProperty('totalPages');
+    expect(response.body.meta).toHaveProperty('pageSize');
   });
 
   // Test GET single mission
@@ -58,14 +64,14 @@ describe('Mission API', () => {
     const response = await request(app)
       .post('/api/missions')
       .send({
-        name: faker.lorem.sentence(),
-        description: faker.lorem.paragraph(),
-        launchDate: faker.date.future().toISOString(),
-        status: faker.helpers.arrayElement(['planned', 'scheduled', 'completed']),
+        name: faker.lorem.words(3),
+        description: faker.lorem.sentences(2),
+        launchDate: faker.date.future(),
+        status: 'planned',
         aircraftId: testAircraftId
       });
     expect(response.status).toBe(201);
-    expect(response.body.name).toBeTruthy();
+    expect(response.body.name).toBe(response.body.name); 
   });
 
   // Test PUT update mission

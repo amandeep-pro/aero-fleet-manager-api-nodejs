@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../../prisma/client';
 
-
 // Create a new mission
 export const createMission = async (req: Request, res: Response) => {
   try {
@@ -21,11 +20,30 @@ export const createMission = async (req: Request, res: Response) => {
   }
 };
 
-// Get all missions
+// Get all missions with pagination
 export const getMissions = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const pageSize = parseInt(req.query.pageSize as string) || 10;
+  const skip = (page - 1) * pageSize;
+
   try {
-    const missions = await prisma.mission.findMany();
-    res.status(200).json(missions);
+    const missions = await prisma.mission.findMany({
+      skip: skip,
+      take: pageSize,
+    });
+
+    const totalMissions = await prisma.mission.count();
+    const totalPages = Math.ceil(totalMissions / pageSize);
+
+    res.status(200).json({
+      data: missions,
+      meta: {
+        totalItems: totalMissions,
+        currentPage: page,
+        totalPages: totalPages,
+        pageSize: pageSize,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve missions' });
   }

@@ -1,11 +1,32 @@
 import { Request, Response } from 'express';
 import prisma from '../../prisma/client';
 
-// Get all airports
+// Get all airports with pagination
 export const getAirports = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const pageSize = parseInt(req.query.pageSize as string) || 10;
+  const skip = (page - 1) * pageSize;
+
   try {
-    const airports = await prisma.airport.findMany();
-    res.json(airports);
+    const [airports, totalItems] = await Promise.all([
+      prisma.airport.findMany({
+        skip,
+        take: pageSize,
+      }),
+      prisma.airport.count(),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    res.json({
+      data: airports,
+      meta: {
+        totalItems,
+        currentPage: page,
+        totalPages,
+        pageSize,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve airports' });
   }
@@ -35,8 +56,10 @@ export const createAirport = async (req: Request, res: Response) => {
     const airport = await prisma.airport.create({
       data: { name, code, location, country },
     });
+    console.log(airport)
     res.status(201).json(airport);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: 'Failed to create airport' });
   }
 };

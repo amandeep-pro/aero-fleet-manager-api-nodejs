@@ -1,13 +1,34 @@
-import { Request, Response } from 'express';
-import prisma from '../../prisma/client';
+import { Request, Response } from "express";
+import prisma from "../../prisma/client";
 
-// Get all aircrafts
+// Get all aircrafts with pagination
 export const getAircrafts = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const pageSize = parseInt(req.query.pageSize as string) || 10;
+  const skip = (page - 1) * pageSize;
+
   try {
-    const aircrafts = await prisma.aircraft.findMany();
-    res.json(aircrafts);
+    const [aircrafts, totalItems] = await Promise.all([
+      prisma.aircraft.findMany({
+        skip,
+        take: pageSize,
+      }),
+      prisma.aircraft.count(),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    res.json({
+      data: aircrafts,
+      meta: {
+        totalItems,
+        currentPage: page,
+        totalPages,
+        pageSize,
+      },
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve aircrafts' });
+    res.status(500).json({ error: "Failed to retrieve aircrafts" });
   }
 };
 
@@ -21,10 +42,10 @@ export const getAircraftById = async (req: Request, res: Response) => {
     if (aircraft) {
       res.json(aircraft);
     } else {
-      res.status(404).json({ error: 'Aircraft not found' });
+      res.status(404).json({ error: "Aircraft not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve aircraft' });
+    res.status(500).json({ error: "Failed to retrieve aircraft" });
   }
 };
 
@@ -37,7 +58,7 @@ export const createAircraft = async (req: Request, res: Response) => {
     });
     res.status(201).json(aircraft);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create aircraft' });
+    res.status(500).json({ error: "Failed to create aircraft" });
   }
 };
 
@@ -52,7 +73,7 @@ export const updateAircraft = async (req: Request, res: Response) => {
     });
     res.json(aircraft);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update aircraft' });
+    res.status(500).json({ error: "Failed to update aircraft" });
   }
 };
 
@@ -65,6 +86,6 @@ export const deleteAircraft = async (req: Request, res: Response) => {
     });
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: 'Failed to delete aircraft' });
+    res.status(500).json({ error: "Failed to delete aircraft" });
   }
 };
