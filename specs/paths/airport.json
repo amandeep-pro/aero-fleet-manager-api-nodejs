@@ -1,17 +1,67 @@
 {
   "get": {
-    "summary": "Retrieve all airports",
+    "summary": "Retrieve all airports with pagination",
     "tags": ["Airport"],
+    "parameters": [
+      {
+        "name": "page",
+        "in": "query",
+        "description": "Page number for pagination",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "default": 1
+        }
+      },
+      {
+        "name": "pageSize",
+        "in": "query",
+        "description": "Number of items per page",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "default": 10
+        }
+      }
+    ],
     "responses": {
       "200": {
-        "description": "List of airports",
+        "description": "List of airports with pagination metadata",
         "content": {
           "application/json": {
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "../components/schemas/airport.json"
-              }
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../components/schemas/airport.json"
+                  }
+                },
+                "meta": {
+                  "type": "object",
+                  "properties": {
+                    "totalItems": {
+                      "type": "integer",
+                      "description": "Total number of airports"
+                    },
+                    "currentPage": {
+                      "type": "integer",
+                      "description": "Current page number"
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "description": "Total number of pages"
+                    },
+                    "pageSize": {
+                      "type": "integer",
+                      "description": "Number of items per page"
+                    }
+                  },
+                  "required": ["totalItems", "currentPage", "totalPages", "pageSize"]
+                }
+              },
+              "required": ["data", "meta"]
             }
           }
         }
