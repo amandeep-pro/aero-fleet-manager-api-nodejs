@@ -5,13 +5,20 @@ import swaggerUi from "swagger-ui-express";
 import { join } from "path";
 import SwaggerParser from "@apidevtools/swagger-parser";
 import { OpenAPIV3 } from "openapi-types";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json())
+const apiRateLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 15 minutes
+  max: 1000, // Limit each IP to 1000 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+});
+
+app.use(express.json());
 
 // Define a variable for the OpenAPI specification
 let openApiSpec: OpenAPIV3.Document | null = null;
@@ -40,7 +47,9 @@ loadOpenApiSpec().then(() => {
     res.send("Server is up");
   });
 
-  app.use("/", routes);
+  // Apply rate limiter to all API routes
+  app.use("/", apiRateLimiter);
+  app.use("/",routes)
 
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
