@@ -6,19 +6,45 @@ import { join } from "path";
 import SwaggerParser from "@apidevtools/swagger-parser";
 import { OpenAPIV3 } from "openapi-types";
 import rateLimit from "express-rate-limit";
+import cors, { CorsOptions } from "cors";
+import helmet from "helmet";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
+// List of allowed origins
+const allowedOrigins = [
+  'http://localhost:3000',
+];
+
+// CORS configuration
+const corsOptions: CorsOptions = {
+  origin: (origin: string | undefined, callback: (error: Error | null, allowed: boolean) => void) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      // Allow requests with no origin or those with allowed origins
+      callback(null, true);
+    } else {
+      // Disallow requests with other origins
+      callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+};
+
+// Rate limiter middleware
 const apiRateLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 15 minutes
+  windowMs: 5 * 60 * 1000, // 5 minutes
   max: 1000, // Limit each IP to 1000 requests per windowMs
   message: "Too many requests from this IP, please try again later.",
 });
 
+// Apply middleware
 app.use(express.json());
+app.use(cors(corsOptions)); // Enable CORS with specific options
+app.use(helmet()); // Set various HTTP headers for security
 
 // Define a variable for the OpenAPI specification
 let openApiSpec: OpenAPIV3.Document | null = null;
@@ -49,7 +75,7 @@ loadOpenApiSpec().then(() => {
 
   // Apply rate limiter to all API routes
   app.use("/", apiRateLimiter);
-  app.use("/",routes)
+  app.use("/", routes);
 
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
