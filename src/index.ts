@@ -8,6 +8,8 @@ import { OpenAPIV3 } from "openapi-types";
 import rateLimit from "express-rate-limit";
 import cors, { CorsOptions } from "cors";
 import helmet from "helmet";
+import expressWinston from "express-winston";
+import logger from "./utils/logger"; 
 
 dotenv.config();
 
@@ -46,6 +48,12 @@ app.use(express.json());
 app.use(cors(corsOptions)); // Enable CORS with specific options
 app.use(helmet()); // Set various HTTP headers for security
 
+// Setup logging with the custom logger
+app.use(expressWinston.logger({
+  transports: logger.transports,
+  format: logger.format,
+}));
+
 // Define a variable for the OpenAPI specification
 let openApiSpec: OpenAPIV3.Document | null = null;
 
@@ -76,6 +84,12 @@ loadOpenApiSpec().then(() => {
   // Apply rate limiter to all API routes
   app.use("/", apiRateLimiter);
   app.use("/", routes);
+
+  // Setup error logging with the custom logger
+  app.use(expressWinston.errorLogger({
+    transports: logger.transports,
+    format: logger.format,
+  }));
 
   app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
